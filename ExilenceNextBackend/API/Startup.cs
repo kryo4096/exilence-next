@@ -55,6 +55,10 @@ namespace API
             services.AddScoped<IGroupRepository, GroupRepository>();
             services.AddScoped<ISnapshotRepository, SnapshotRepository>();
 
+            services.AddScoped<ICassandraRepository, CassandraRepository>();
+
+            Task initializeCassandra = ExilenceCassandra.InitializeSession(new List<string>() { Configuration.GetSection("Cassandra")["Host"] }, Configuration.GetSection("Cassandra")["Keyspace"]);
+
             //services.AddSignalR().AddMessagePackProtocol();
 
             services.AddSignalR(o =>
