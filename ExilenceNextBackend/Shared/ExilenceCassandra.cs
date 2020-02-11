@@ -8,10 +8,16 @@ using Shared.Entities;
 
 namespace Shared
 {
+    // https://www.datastax.com/examples?language=86
+    // https://docs.datastax.com/en/developer/csharp-driver/3.13/features/datatypes/
+    // https://github.com/DataStax-Examples/concurrent-requests-csharp
+    // https://github.com/DataStax-Examples/linq-csharp/blob/master/Program.cs
+    // https://github.com/DataStax-Examples/object-mapper-csharp/blob/master/Program.cs
+    // https://docs.datastax.com/en/dse/6.7/cql/cql/cql_using/useCreateUDT.html
+
     public class ExilenceCassandra
     {
         public static ISession Session { get; set; }
-        public static IMapper Mapper { get; set; }
 
         public static async Task InitializeSession(IEnumerable<string> hosts, string username, string password, string keyspace)
         {
@@ -39,7 +45,7 @@ namespace Shared
                                                                 Created timestamp,
                                                             PRIMARY KEY(Id))")).ConfigureAwait(false);
         }
-
+        
         private static void SetMappingConfiguration()
         {
             MappingConfiguration.Global.Define(
