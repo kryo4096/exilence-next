@@ -1,18 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using API.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Shared;
 using Shared.Interfaces;
 using Shared.Repositories;
@@ -24,6 +20,8 @@ using API.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 using API.Providers;
 using MessagePack;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 
 namespace API
 {
@@ -57,14 +55,23 @@ namespace API
 
             services.AddScoped<ICassandraRepository, CassandraRepository>();
 
-            Task initializeCassandra = ExilenceCassandra.InitializeSession(
-                new List<string>() { Configuration.GetSection("Cassandra")["Host"] },
-                Configuration.GetSection("Cassandra")["Username"],
-                Configuration.GetSection("Cassandra")["Password"],
-                Configuration.GetSection("Cassandra")["Keyspace"]
-                );
+            try
+            {
+                ILoggerProvider provider = new NLogLoggerProvider();
+                Cassandra.Diagnostics.AddLoggerProvider(provider);
 
-            //services.AddSignalR().AddMessagePackProtocol();
+                Task initializeCassandra = ExilenceCassandra.InitializeSession(
+                    new List<string>() { Configuration.GetSection("Cassandra")["Host"] },
+                    Configuration.GetSection("Cassandra")["Username"],
+                    Configuration.GetSection("Cassandra")["Password"],
+                    Configuration.GetSection("Cassandra")["Keyspace"]
+                    );
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
 
             services.AddSignalR(o =>
             {
@@ -77,7 +84,7 @@ namespace API
                 options.Configuration.ConnectTimeout = 10000;
             }).AddMessagePackProtocol(options =>
             {
-                options.FormatterResolvers = new List<MessagePack.IFormatterResolver>()
+                options.FormatterResolvers = new List<IFormatterResolver>()
                 {
                     MessagePack.Resolvers.StandardResolver.Instance
                 };
