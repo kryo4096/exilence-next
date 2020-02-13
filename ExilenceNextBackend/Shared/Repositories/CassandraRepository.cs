@@ -1,4 +1,5 @@
 ﻿using Cassandra;
+using Cassandra.Data.Linq;
 using Cassandra.Mapping;
 using Microsoft.Extensions.Configuration;
 using Shared.Entities;
@@ -23,6 +24,11 @@ namespace Shared.Repositories
             _mapper = new Mapper(ExilenceCassandra.Session);
         }
 
+        public async Task AddAccount(Account account)
+        {
+            var users = new Table<Account>(ExilenceCassandra.Session);
+            var result = await users.Insert(account).ExecuteAsync();
+        }
 
     }
 }
