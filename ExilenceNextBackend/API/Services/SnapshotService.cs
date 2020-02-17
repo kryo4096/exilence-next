@@ -51,7 +51,7 @@ namespace API.Services
                 .AsNoTracking()
                 .FirstAsync();
 
-            snapshot.ProfileId = profile.Id;
+            //snapshot.ProfileId = profile.Id;
 
             await _snapshotRepository.AddSnapshots(new List<Snapshot>() { snapshot });
 

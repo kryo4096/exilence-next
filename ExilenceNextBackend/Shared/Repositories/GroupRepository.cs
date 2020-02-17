@@ -39,11 +39,12 @@ namespace Shared.Repositories
 
         public async Task<Connection> GetConnection(string connectionId)
         {
-            var connection = await _exilenceContext.Connections
-                .Include(connection => connection.Account)
-                .ThenInclude(account => account.Profiles)
-                .FirstOrDefaultAsync(c => c.ConnectionId == connectionId);
-            return connection;
+            //    var connection = await _exilenceContext.Connections
+            //        .Include(connection => connection.Account)
+            //        .ThenInclude(account => account.Profiles)
+            //        .FirstOrDefaultAsync(c => c.ConnectionId == connectionId);
+            //    return connection;
+            throw new NotImplementedException();
         }
 
         public async Task<Connection> RemoveConnection(string connectionId)

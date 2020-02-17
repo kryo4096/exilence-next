@@ -8,6 +8,7 @@ namespace Shared.Interfaces
 {
     public interface ICassandraRepository
     {
+        Task<Account> GetAccount(string name);
         Task AddAccount(Account account);
     }
 }

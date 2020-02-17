@@ -15,10 +15,12 @@ namespace API.Services
     {
         ISnapshotRepository _snapshotRepository;
         IAccountRepository _accountRepository;
+        ICassandraRepository _cassandraRepository;
         readonly IMapper _mapper;
 
-        public AccountService(ISnapshotRepository snapshotRepository, IAccountRepository accountRepository, IMapper mapper)
+        public AccountService(ISnapshotRepository snapshotRepository, ICassandraRepository cassandraRepository, IAccountRepository accountRepository, IMapper mapper)
         {
+            _cassandraRepository = cassandraRepository;
             _snapshotRepository = snapshotRepository;
             _accountRepository = accountRepository;
             _mapper = mapper;
@@ -26,7 +28,7 @@ namespace API.Services
 
         public async Task<AccountModel> GetAccount(string accountName)
         {
-            var account = await _accountRepository.GetAccounts(account => account.Name == accountName).FirstOrDefaultAsync();
+            var account = await _cassandraRepository.GetAccount(accountName);
             return _mapper.Map<AccountModel>(account);
         }
 
@@ -39,8 +41,9 @@ namespace API.Services
         public async Task<AccountModel> AddAccount(AccountModel accountModel)
         {
             var account = _mapper.Map<Account>(accountModel);
-            account = _accountRepository.AddAccount(account);
             account.LastLogin = DateTime.UtcNow;
+            await _cassandraRepository.AddAccount(account);
+
             await _accountRepository.SaveChangesAsync();
             accountModel = _mapper.Map<AccountModel>(account);
             return accountModel;

@@ -17,6 +17,6 @@ namespace Shared.Models
         [Key("stashTabs")]
         public List<StashtabModel> StashTabs { get; set; }
         [Key("created")]
-        public DateTime? Created { get; set; }
+        public DateTimeOffset? Created { get; set; }
     }
 }

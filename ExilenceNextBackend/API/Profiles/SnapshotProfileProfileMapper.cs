@@ -12,8 +12,7 @@ namespace API.Profiles
     {
         public SnapshotProfileProfileMapper()
         {
-            CreateMap<SnapshotProfileModel, SnapshotProfile>()
-                .ForMember(o => o.Id, opt => opt.Ignore());
+            CreateMap<SnapshotProfileModel, SnapshotProfile>();
             CreateMap<SnapshotProfile, SnapshotProfileModel>();
         }
     }

@@ -150,9 +150,9 @@ namespace API
             var instanceName = configuration.GetSection("Settings")["InstanceName"];
 
             //Remove faulty connections to this node on startup if node crasched
-            exilenceContext.Database.ExecuteSqlRaw($"DELETE FROM Connections WHERE InstanceName = '{instanceName}'");
+            //exilenceContext.Database.ExecuteSqlRaw($"DELETE FROM Connections WHERE InstanceName = '{instanceName}'");
             //Remove groups with no connections after connection cleanup
-            exilenceContext.Database.ExecuteSqlRaw($"DELETE FROM Groups WHERE Id IN (SELECT g.Id FROM Groups g WHERE (SELECT COUNT(*) FROM Connections WHERE GroupId = g.Id) = 0)");
+            //exilenceContext.Database.ExecuteSqlRaw($"DELETE FROM Groups WHERE Id IN (SELECT g.Id FROM Groups g WHERE (SELECT COUNT(*) FROM Connections WHERE GroupId = g.Id) = 0)");
         }
     }
 }

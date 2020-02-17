@@ -26,9 +26,15 @@ namespace Shared.Repositories
 
         public async Task AddAccount(Account account)
         {
-            var users = new Table<Account>(ExilenceCassandra.Session);
-            var result = await users.Insert(account).ExecuteAsync();
+            var accounts = new Table<Account>(ExilenceCassandra.Session);
+            var result = await accounts.Insert(account).ExecuteAsync();
         }
 
+        public async Task<Account> GetAccount(string name)
+        {
+            var accounts = new Table<Account>(ExilenceCassandra.Session);
+            var account = await accounts.Select(account => account).ExecuteAsync();
+            return account.FirstOrDefault();
+        }
     }
 }
