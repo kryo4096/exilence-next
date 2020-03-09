@@ -28,8 +28,16 @@ namespace API.Services
 
         public async Task<AccountModel> GetAccount(string accountName)
         {
+            try
+            {
             var account = await _cassandraRepository.GetAccount(accountName);
             return _mapper.Map<AccountModel>(account);
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
 
         public async Task<ConnectionModel> GetConnection(string accountName)

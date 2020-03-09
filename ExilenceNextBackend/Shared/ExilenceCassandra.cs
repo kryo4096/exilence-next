@@ -25,7 +25,7 @@ namespace Shared
             var cluster = Cluster.Builder().WithCredentials(username, password).AddContactPoints(hosts).Build();
 
             // 2 Set Mapping configuration
-            //SetMappingConfiguration();
+            SetMappingConfiguration();
 
             // 3 Create Session
             Session = await cluster.ConnectAsync();
@@ -38,84 +38,54 @@ namespace Shared
         
         private async static void SetMappingConfiguration()
         {
-            //MappingConfiguration.Global.Define(
-            //    new Map<Account>()
-            //    .TableName("Accounts")
-            //    .PartitionKey(u => u.Id)
-            //    .Column(u => u.Id, cm => cm.WithName("Id")));
+            MappingConfiguration.Global.Define(
+                new Map<Account>()
+                .TableName("Accounts")
+                .PartitionKey(u => u.ClientId)
+                .Column(u => u.ClientId, cm => cm.WithName("ClientId")));
 
-            await Session.UserDefinedTypes.DefineAsync(UdtMap.For<Account>());
-            await Session.UserDefinedTypes.DefineAsync(UdtMap.For<Connection>());
-            await Session.UserDefinedTypes.DefineAsync(UdtMap.For<Group>());
-            await Session.UserDefinedTypes.DefineAsync(UdtMap.For<SnapshotProfile>());
-            await Session.UserDefinedTypes.DefineAsync(UdtMap.For<Snapshot>());
-            await Session.UserDefinedTypes.DefineAsync(UdtMap.For<Stashtab>());
-            await Session.UserDefinedTypes.DefineAsync(UdtMap.For<PricedItem>());
+            MappingConfiguration.Global.Define(
+                new Map<Connection>()
+                .TableName("Connections")
+                .PartitionKey(u => u.ConnectionId)
+                .Column(u => u.ConnectionId, cm => cm.WithName("ConnectionId")));
+
+            
+            MappingConfiguration.Global.Define(
+                new Map<Group>()
+                .TableName("Groups")
+                .PartitionKey(u => u.ClientId)
+                .Column(u => u.ClientId, cm => cm.WithName("ClientId")));
+
+            MappingConfiguration.Global.Define(
+                new Map<SnapshotProfile>()
+                .TableName("SnapshotProfiles")
+                .PartitionKey(u => u.ClientId)
+                .Column(u => u.ClientId, cm => cm.WithName("ClientId")));
+
+                
+            MappingConfiguration.Global.Define(
+                new Map<Snapshot>()
+                .TableName("Snapshots")
+                .PartitionKey(u => u.ClientId)
+                .Column(u => u.ClientId, cm => cm.WithName("ClientId")));
+
+            MappingConfiguration.Global.Define(
+                new Map<Stashtab>()
+                .TableName("Stashtabs")
+                .PartitionKey(u => u.ClientId)
+                .Column(u => u.ClientId, cm => cm.WithName("ClientId")));
+
+            MappingConfiguration.Global.Define(
+                new Map<PricedItem>()
+                .TableName("PricedItems")
+                .PartitionKey(u => u.ClientId)
+                .Column(u => u.ClientId, cm => cm.WithName("ClientId")));
 
         }
 
         private async static Task CreateDatabaseTables()
         {
-            await Session.ExecuteAsync(new SimpleStatement(@"
-            CREATE TABLE IF NOT EXISTS 
-            Accounts(
-                ClientId uuid, 
-                Name varchar, 
-                Verified boolean, 
-                Role int, 
-                Version int, 
-                LastLogin timestamp, 
-                Created timestamp,
-            PRIMARY KEY(ClientId))
-            "));
-
-            await Session.ExecuteAsync(new SimpleStatement(@"
-            CREATE TABLE IF NOT EXISTS 
-            Connections(
-            ConnectionId varchar,
-            InstanceName varchar,
-            Created timestamp,
-            PRIMARY KEY(ConnectionId))
-            ")).ConfigureAwait(false);
-
-            await Session.ExecuteAsync(new SimpleStatement(@"
-            CREATE TABLE IF NOT EXISTS 
-            Groups(
-                ClientId uuid, 
-                Name varchar,
-                Hash varchar,
-                Salt varchar,
-                Created timestamp,
-            PRIMARY KEY(ClientId))
-            ")).ConfigureAwait(false);
-
-            await Session.ExecuteAsync(new SimpleStatement(@"
-            CREATE TABLE IF NOT EXISTS 
-            SnapshotProfiles(
-                ClientId uuid, 
-
-            PRIMARY KEY(ClientId))
-            ")).ConfigureAwait(false);
-
-            await Session.ExecuteAsync(new SimpleStatement(@"
-            CREATE TABLE IF NOT EXISTS 
-            Snapshots(
-                ClientId uuid, 
-                Created timestamp,
-            PRIMARY KEY(ClientId))
-            ")).ConfigureAwait(false);
-
-            await Session.ExecuteAsync(new SimpleStatement(@"
-            CREATE TABLE IF NOT EXISTS 
-            StashTabs(
-                ClientId uuid,
-                StashTabId varchar,
-                Name varchar,
-                TabIndex int,
-                Color varchar,
-                Value decimal,
-            PRIMARY KEY(ClientId))
-            ")).ConfigureAwait(false);
 
             await Session.ExecuteAsync(new SimpleStatement(@"
             CREATE TABLE IF NOT EXISTS 
@@ -146,6 +116,77 @@ namespace Shared
                 Median decimal,
                 BaseType varchar,
                 Count int,
+            PRIMARY KEY(ClientId))
+            ")).ConfigureAwait(false);
+
+            await Session.ExecuteAsync(new SimpleStatement(@"
+            CREATE TABLE IF NOT EXISTS 
+            Stashtabs(
+                ClientId uuid,
+                StashTabId varchar,
+                Name varchar,
+                TabIndex int,
+                Color varchar,
+                Value decimal,
+                PricedItems set<frozen<priceditems>>,
+            PRIMARY KEY(ClientId))
+            ")).ConfigureAwait(false);
+
+            await Session.ExecuteAsync(new SimpleStatement(@"
+            CREATE TABLE IF NOT EXISTS 
+            Connections(
+                ConnectionId varchar,
+                InstanceName varchar,
+                Created timestamp,
+            PRIMARY KEY(ConnectionId))
+            ")).ConfigureAwait(false);
+
+            await Session.ExecuteAsync(new SimpleStatement(@"
+            CREATE TABLE IF NOT EXISTS 
+            Groups(
+                ClientId uuid, 
+                Name varchar,
+                Hash varchar,
+                Salt varchar,
+                Created timestamp,
+            PRIMARY KEY(ClientId))
+            ")).ConfigureAwait(false);
+
+            await Session.ExecuteAsync(new SimpleStatement(@"
+            CREATE TABLE IF NOT EXISTS 
+            Snapshots(
+                ClientId uuid, 
+                Created timestamp,
+                StashTabs set<frozen<stashtabs>>,
+            PRIMARY KEY(ClientId))
+            ")).ConfigureAwait(false);
+
+            await Session.ExecuteAsync(new SimpleStatement(@"
+            CREATE TABLE IF NOT EXISTS 
+            SnapshotProfiles(
+                ClientId uuid, 
+                Name varchar,
+                ActiveLeagueId varchar,
+                ActivePriceLeagueId varchar,
+                Active boolean,
+                Created timestmap,
+                ActiveStashTabIds set<frozen<varchar>>,
+                Snapshots set<frozen<Snapshots>>,
+            PRIMARY KEY(ClientId))
+            ")).ConfigureAwait(false);
+
+
+            await Session.ExecuteAsync(new SimpleStatement(@"
+            CREATE TABLE IF NOT EXISTS 
+            Accounts(
+                ClientId uuid, 
+                Name varchar, 
+                Verified boolean, 
+                Role int, 
+                Version int, 
+                LastLogin timestamp, 
+                Created timestamp,
+                Profiles list<FROZEN<SnapshotProfiles>>,
             PRIMARY KEY(ClientId))
             ")).ConfigureAwait(false);
         }
