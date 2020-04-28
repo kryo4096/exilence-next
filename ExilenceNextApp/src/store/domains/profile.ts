@@ -513,7 +513,7 @@ export class Profile {
 
     prices = prices.filter(
       (p) =>
-        p.calculated && p.calculated >= rootStore.settingStore.priceTreshold
+        p.calculated
     );
 
     prices = excludeLegacyMaps(prices);
@@ -533,7 +533,7 @@ export class Profile {
         stashTabWithItems.pricedItems = stashTabWithItems.pricedItems.filter(
           (pi) =>
             pi.calculated > 0 &&
-            pi.total >= rootStore.settingStore.priceTreshold
+            (pi.total >= rootStore.settingStore.priceTreshold || pi.calculated >= rootStore.settingStore.stackPriceThreshold)
         );
 
         stashTabWithItems.value = stashTabWithItems.pricedItems

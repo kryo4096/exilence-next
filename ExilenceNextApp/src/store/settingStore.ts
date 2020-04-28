@@ -7,6 +7,7 @@ export class SettingStore {
   @persist @observable lowConfidencePricing: boolean = false;
   @persist @observable autoSnapshotting: boolean = true;
   @persist @observable priceTreshold: number = 0;
+  @persist @observable stackPriceThreshold: number = 0;
   @persist @observable autoSnapshotInterval: number = 60 * 2 * 1000; // default to 2 minutes
   @persist
   @observable
@@ -45,6 +46,12 @@ export class SettingStore {
   setPriceTreshold(value: number) {
     this.priceTreshold = value;
   }
+
+  @action
+  setStackPriceThreshold(value: number) {
+    this.stackPriceThreshold = value;
+  }
+
 
   @action
   setAutoSnapshotInterval(value: number) {
